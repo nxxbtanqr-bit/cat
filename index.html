@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Luarmor | Blacklisted</title>
+  <style>
+    :root {
+      --bg-page: #000;
+      --bg-panel: #1b1f24;
+      --text-primary: #f2f4f6;
+      --text-muted: #e1e6ec;
+      --accent: #e25050;
+      --button: #484b4f;
+      --button-hover: #5a5e63;
+      --line-mid: rgba(255,255,255,0.42);
+      --line-tip: rgba(255,255,255,0.95);
+    }
+
+    html,body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-family: Bahnschrift,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    }
+
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .wrap.visible {
+      opacity: 1;
+    }
+
+    .panel {
+      position: relative;
+      width: min(750px,100%);
+      background: var(--bg-panel);
+      box-sizing: border-box;
+      padding: 36px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .panel::before,
+    .panel::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background-image: linear-gradient(to right,var(--line-mid),var(--line-mid)),
+                        linear-gradient(to right,var(--line-tip),var(--line-tip)),
+                        linear-gradient(to right,var(--line-tip),var(--line-tip));
+      background-repeat: no-repeat,no-repeat,no-repeat;
+      background-size: 100% 1px,6px 1px,6px 1px;
+      background-position: 0 0,0 0,100% 0;
+      pointer-events: none;
+    }
+
+    .panel::before { top: 0 }
+    .panel::after { bottom: 0 }
+
+    .title {
+      margin: 6px 0 8px 0;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      font-size: 30px;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .body {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 18px;
+      font-weight: 350;
+      line-height: 1.35;
+      text-align: center;
+      max-width: 640px;
+    }
+
+    .code {
+      margin-top: 6px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 18px;
+      font-weight: 350;
+    }
+
+    .actions {
+      margin-top: auto;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn {
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 248px;
+      height: 64px;
+      background: var(--button);
+      border: none;
+      border-radius: 0;
+      font-size: 24px;
+      letter-spacing: 0.06em;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 160ms ease,transform 60ms ease;
+      font-family: inherit;
+    }
+
+    .btn:hover { background: var(--button-hover) }
+    .btn:active { transform: translateY(1px) }
+
+    .ban-overlay {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .ban-img {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1);
+      opacity: 1;
+      animation: zoomFade 1.75s ease-in forwards;
+      animation-delay: 0.75s;
+    }
+
+    .ban-flash {
+      position: relative;
+      width: 60vmin;
+      height: 60vmin;
+      border-radius: 60%;
+      opacity: 0;
+      filter: blur(2px);
+      animation: flashPulse 1s step-end forwards;
+      animation-delay: 0s;
+      background: radial-gradient(circle,
+        rgba(255,255,255,1) 0%,
+        rgba(255,255,200,0.9) 25%,
+        rgba(255,255,255,0.65) 45%,
+        rgba(255,255,255,0.2) 60%,
+        rgba(255,255,255,0) 75%);
+    }
+
+    .ban-flash::after {
+      content: "";
+      position: absolute;
+      inset: -25%;
+      background: conic-gradient(from 0deg,
+        rgba(255,255,255,0.95) 0deg,
+        rgba(255,255,255,0) 12deg,
+        rgba(255,255,255,0.95) 84deg,
+        rgba(255,255,255,0) 84deg,
+        rgba(255,255,255,0.95) 96deg,
+        rgba(255,255,255,0) 108deg,
+        rgba(255,255,255,0.95) 180deg,
+        rgba(255,255,255,0) 184deg,
+        rgba(255,255,255,0.95) 264deg,
+        rgba(255,255,255,0) 276deg,
+        rgba(255,255,255,0.95) 346deg,
+        rgba(255,255,255,0) 348deg,
+        rgba(255,255,255,0) 360deg),
+        radial-gradient(circle at center,
+        rgba(255,255,255,0.7),rgba(255,255,255,0) 60%);
+      mix-blend-mode: screen;
+      filter: blur(6px);
+      mask-image: radial-gradient(circle at center,rgba(0,0,0,1)45%,rgba(0,0,0,0)75%);
+    }
+
+    @keyframes flashPulse {
+      0% { opacity: 0.5; transform: scale(0.9) }
+      5% { opacity: 1; transform: scale(0.85) }
+      10% { opacity: 0; transform: scale(0.9) }
+      20% { opacity: 1; transform: scale(1) }
+      60% { opacity: 0.85; transform: scale(1.05) }
+      65% { opacity: 0.65; transform: scale(1.05) }
+      70% { opacity: 0.55; transform: scale(1.1) }
+      75% { opacity: 0.35; transform: scale(1.2) }
+      80% { opacity: 0.15; transform: scale(1.3) }
+      85% { opacity: 0.1; transform: scale(1.4) }
+      90% { opacity: 0.05; transform: scale(1.5) }
+      100% { opacity: 0; transform: scale(1.1) }
+    }
+
+    @keyframes zoomFade {
+      0% { transform: scale(1); opacity: 1 }
+      100% { transform: scale(1.15); opacity: 0 }
+    }
+
+    .ban-overlay.hidden { display: none!important }
+  </style>
+</head>
+<body>
+  <!-- Flash overlay -->
+  <div class="ban-overlay" id="banOverlay" aria-hidden="true">
+    <img class="ban-img" id="banImg" src="vgkban.jpg" alt=""/>
+    <div class="ban-flash" aria-hidden="true"></div>
+  </div>
+
+  <div class="wrap" id="mainWrap">
+    <div class="panel">
+      <div class="title">Connection Error</div>
+      <p class="body">
+        A review detected that actions of an account playing on this device violated the User Rules (Section 7) of our Terms of Service. 
+        This device is now restricted from access. Fair play and respecting the integrity of a match are essential to be a team that wins together. 
+        We encourage you to reflect on your behavior to be a respectful player in future games. You can visit our Terms of Service to learn more, 
+        including your right to appeal.
+      </p>
+      <div class="code">Error Code: VAN 152</div>
+      <div class="actions"><button class="btn">Quit</button></div>
+    </div>
+  </div>
+
+  <script>
+    const img = document.getElementById('banImg');
+    const overlay = document.getElementById('banOverlay');
+    const wrap = document.getElementById('mainWrap');
+
+    if (img && overlay && wrap) {
+      img.addEventListener('animationend', function(e) {
+        if (e.animationName === 'zoomFade') {
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+            wrap.classList.add('visible');
+          }, 200);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
